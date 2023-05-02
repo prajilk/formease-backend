@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://192.168.18.25:3000'],
+    origin: ['http://localhost:3000', 'https://formease.vercel.app'],
     credentials: true
 }))
 
