@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors({
-    origin: 'https://formease.vercel.app/',
+    origin: true,
     credentials: true
 }))
 
