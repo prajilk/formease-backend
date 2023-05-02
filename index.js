@@ -19,9 +19,13 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors({
-    origin: true,
+    origin: ['http://localhost:3000', 'https://formease.vercel.app'],
     credentials: true
 }))
+
+app.get('/test', (req, res) => {
+    res.json({ test: 'success' })
+})
 
 // Register new user
 app.post('/register', (req, res) => {
