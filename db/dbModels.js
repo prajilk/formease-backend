@@ -15,8 +15,12 @@ module.exports = {
                 default: false
             }
         }, { collection: 'users', versionKey: false })
-        const Users = mongoose.model('Users', userSchema);
-        return Users;
+        if (!mongoose.models.Users) {
+            Users = mongoose.model('Users', userSchema);
+            return Users;
+        } else {
+            return Users;
+        }
     },
     Forms: () => {
         const formSchema = Schema({

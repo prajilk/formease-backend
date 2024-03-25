@@ -88,32 +88,36 @@ module.exports = {
     },
     getAllForms: (userId) => {
         return new Promise(async (resolve, reject) => {
-            const formList = await formModel.aggregate([
-                {
-                    $match: {
-                        user_id: new mongoose.Types.ObjectId(userId)
-                    }
-                },
-                {
-                    $project: {
-                        forms: {
-                            $map: {
-                                input: "$forms",
-                                as: "form",
-                                in: {
-                                    form_id: "$$form.form_id",
-                                    form_name: "$$form.form_name",
-                                    service_cancelled: "$$form.service_cancelled"
+            try {
+                const formList = await formModel.aggregate([
+                    {
+                        $match: {
+                            user_id: new mongoose.Types.ObjectId(userId)
+                        }
+                    },
+                    {
+                        $project: {
+                            forms: {
+                                $map: {
+                                    input: "$forms",
+                                    as: "form",
+                                    in: {
+                                        form_id: "$$form.form_id",
+                                        form_name: "$$form.form_name",
+                                        service_cancelled: "$$form.service_cancelled"
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            ])
-            if (formList[0])
-                resolve(formList[0].forms);
-            else
-                reject();
+                ])
+                if (formList[0])
+                    resolve(formList[0].forms);
+                else
+                    reject();
+            } catch (error) {
+                reject()
+            }
         })
     },
     getTotalNumberOfForms: (userId) => {

@@ -6,6 +6,10 @@ const refreshToken = (req, res, next, callback) => {
     if (req.cookies.refreshToken) {
 
         const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            // return res.status(401).json({ data: 'Refresh token is missing' });
+            return res.status(401).send({ data: 'Refresh token is missing', error: true });
+        }
 
         // Verify refresh token
         try {
@@ -22,11 +26,13 @@ const refreshToken = (req, res, next, callback) => {
                 httpOnly: true,
                 sameSite: 'none',
                 secure: true,
-                maxAge: 259200000 // 3 Days
+                maxAge: 1296000000 // 15 Days
             });
 
             // Update the accessToken with new accessToken
             req.cookies.accessToken = accessToken;
+
+            // return res.json({ data: 'Access token expired!. New Access token Created' }); // Return success message
 
             // Call the callback function passed through the parameter, to again execute the function after refreshing the token.
             return callback(req, res, next);
