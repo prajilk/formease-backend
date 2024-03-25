@@ -48,15 +48,13 @@ app.get('/signout', (req, res) => {
         httpOnly: true,
         sameSite: "none",
         secure: true,
-        expires: new Date(),
-        maxAge: new Date()
+        expires: new Date(0),
     });
     res.clearCookie("refreshToken", {
         httpOnly: true,
         sameSite: "none",
         secure: true,
-        expires: new Date(),
-        maxAge: new Date()
+        expires: new Date(0),
     });
     res.status(200).json({ data: "Logout out successfully" });
 
