@@ -49,12 +49,16 @@ app.get('/signout', (req, res) => {
         sameSite: "none",
         secure: true,
         expires: new Date(0),
+        domain: "formease-server-vercel.app",
+        path: '/'
     });
     res.clearCookie("refreshToken", {
         httpOnly: true,
         sameSite: "none",
         secure: true,
         expires: new Date(0),
+        domain: "formease-server-vercel.app",
+        path: '/'
     });
     res.status(200).json({ data: "Logout out successfully" });
 
