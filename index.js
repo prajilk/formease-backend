@@ -44,23 +44,19 @@ app.get('/user/verify', verifyToken)
 
 // Signout user
 app.get('/signout', (req, res) => {
-    // Set refresh token in cookie
-    res.cookie('refreshToken', "", {
+    res.clearCookie("accessToken", {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: "none",
         secure: true,
-        expires: new Date(0)
+        expires: new Date(0),
     });
-
-    // Set access token in cookie
-    res.cookie('accessToken', "", {
+    res.clearCookie("refreshToken", {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: "none",
         secure: true,
-        expires: new Date(0)
+        expires: new Date(0),
     });
-
-    return res.status(200).json({ data: "Logout out successfully" });
+    res.status(200).json({ data: "Logout out successfully" });
 
 })
 
