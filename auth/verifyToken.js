@@ -5,12 +5,12 @@ require('dotenv').config();
 
 const verifyToken = (req, res, next) => {
 
-    if(req.cookies?.accessToken){
+    if (req.cookies?.accessToken) {
 
         // Check if access token is present in header or cookies
         const accessToken = req.cookies.accessToken;
         if (!accessToken) {
-            return res.status(401).send({ data: 'Access token is missing', error: true });
+            return res.status(403).send({ data: 'Access token is missing', error: true });
         }
 
         // Verify access token

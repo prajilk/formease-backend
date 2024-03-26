@@ -44,23 +44,23 @@ app.get('/user/verify', verifyToken)
 
 // Signout user
 app.get('/signout', (req, res) => {
-    res.clearCookie("accessToken", {
+    // Set refresh token in cookie
+    res.cookie('refreshToken', "", {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: 'none',
         secure: true,
-        expires: new Date(0),
-        domain: "formease-server-vercel.app",
-        path: '/'
+        expires: new Date(0)
     });
-    res.clearCookie("refreshToken", {
+
+    // Set access token in cookie
+    res.cookie('accessToken', "", {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: 'none',
         secure: true,
-        expires: new Date(0),
-        domain: "formease-server-vercel.app",
-        path: '/'
+        expires: new Date(0)
     });
-    res.status(200).json({ data: "Logout out successfully" });
+
+    return res.status(200).json({ data: "Logout out successfully" });
 
 })
 

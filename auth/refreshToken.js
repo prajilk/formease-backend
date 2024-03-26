@@ -8,7 +8,7 @@ const refreshToken = (req, res, next, callback) => {
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
             // return res.status(401).json({ data: 'Refresh token is missing' });
-            return res.status(401).send({ data: 'Refresh token is missing', error: true });
+            return res.status(403).send({ data: 'Refresh token is missing', error: true });
         }
 
         // Verify refresh token
@@ -40,10 +40,10 @@ const refreshToken = (req, res, next, callback) => {
         } catch (err) {
             res.clearCookie('refreshToken');
             res.clearCookie('accessToken');
-            return res.status(401).json({ data: 'Refresh token is invalid', error: true });
+            return res.status(403).json({ data: 'Refresh token is invalid', error: true });
         }
     } else {
-        return res.status(401).json({ data: 'Cookie doesnt have REFRESH Token', error: true });
+        return res.status(403).json({ data: "Cookie doesn't have REFRESH Token", error: true });
     }
 }
 
