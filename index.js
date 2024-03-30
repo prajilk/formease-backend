@@ -37,7 +37,7 @@ app.post('/login', async (req, res) => login(req, res))
 
 // Verify user
 app.get('/user/verify', verifyToken, (req, res) => {
-    res.status(200).json({ message: "Access granted" });
+    res.status(200).json({ message: "Access granted", user: req.user });
 })
 
 app.post('/edit-profile', (req, res) => {

@@ -7,8 +7,14 @@ function login(req, res) {
         // Remove the password from the validUser
         const user = Object.assign({}, validUser);
 
+        const payload = {
+            _id: user._doc._id,
+            fullname: user._doc.fullname,
+            email: user._doc.email
+        }
+
         // Generate access token (expires in 10 minutes)
-        const accessToken = jwt.sign({ _id: user._doc._id }, process.env.TOKEN_SECRET, { expiresIn: '1d' });
+        const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1d' });
 
         return res.status(200).json({ token: accessToken, error: false })
     }).catch((err) => {
