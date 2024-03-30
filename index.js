@@ -3,17 +3,15 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 require('dotenv').config()
-// const createTokens = require('./auth/createTokens');
-// const verifyToken = require('./auth/verifyToken')
-const { verifyToken } = require('./auth/v1/verifyToken')
 
 //Connect to database
 require('./db/dbConnection')();
 
+const { login } = require('./auth/login');
+const { verifyToken } = require('./auth/verifyToken');
+
 const userHelper = require('./helpers/userHelper');
-// const getUserDetails = require('./auth/getUserDetails');
 const formHelper = require('./helpers/formHelper');
-const { login } = require('./auth/v1/login');
 
 const app = express();
 
@@ -35,30 +33,12 @@ app.post('/register', (req, res) => {
 })
 
 // Login route
-// app.post('/login', async (req, res) => { createTokens(req, res); })
 app.post('/login', async (req, res) => login(req, res))
 
 // Verify user
 app.get('/user/verify', verifyToken, (req, res) => {
     res.status(200).json({ message: "Access granted" });
 })
-
-// Signout user
-// app.get('/signout', (req, res) => {
-//     res.clearCookie("accessToken", {
-//         httpOnly: true,
-//         sameSite: "none",
-//         secure: true,
-//         expires: new Date(0),
-//     });
-//     res.clearCookie("refreshToken", {
-//         httpOnly: true,
-//         sameSite: "none",
-//         secure: true,
-//         expires: new Date(0),
-//     });
-//     res.status(200).json({ data: "Logout out successfully" });
-// })
 
 app.post('/edit-profile', (req, res) => {
     userHelper.editProfile(req.body).then(() => {

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const userHelper = require("../../helpers/userHelper");
+const userHelper = require("../helpers/userHelper");
 
 function login(req, res) {
     userHelper.login(req.body).then((validUser) => {

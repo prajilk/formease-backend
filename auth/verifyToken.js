@@ -1,33 +1,23 @@
-const jwt = require('jsonwebtoken');
-const refreshToken = require('./refreshToken');
-require('dotenv').config();
+const jwt = require("jsonwebtoken");
 
+function verifyToken(req, res, next) {
+    const { authorization } = req.headers;
 
-const verifyToken = (req, res, next) => {
+    if (!authorization) {
+        return res.status(401).json({ error: "Authorization token required" })
+    }
 
-    if (req.cookies?.accessToken) {
+    const token = authorization.split(" ")[1];
 
-        // Check if access token is present in header or cookies
-        const accessToken = req.cookies.accessToken;
-        if (!accessToken) {
-            return res.status(403).send({ data: 'Access token is missing', error: true });
-        }
-
-        // Verify access token
-        try {
-            const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-
-            // Do something with the user ID (e.g., fetch user data from database)
-
-            return res.status(200).json({ data: req.cookies.data, user: decoded, error: false }); // Return protected data
-        } catch (err) {
-            // Refresh the ACCESS Token using REFRESH Token
-            return refreshToken(req, res, next, verifyToken)
-        }
-
-    } else {
-        return res.status(403).send({ data: 'Cookie is not received', error: true });
+    try {
+        const user = jwt.verify(token, process.env.TOKEN_SECRET)
+        req.user = user;
+        return next();
+    } catch (error) {
+        return res.status(401).json({ error: "Request is not Authorized" })
     }
 }
 
-module.exports = verifyToken;
+module.exports = {
+    verifyToken
+}
