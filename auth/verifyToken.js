@@ -21,12 +21,12 @@ const verifyToken = (req, res, next) => {
 
             return res.status(200).json({ data: req.cookies.data, user: decoded, error: false }); // Return protected data
         } catch (err) {
-            // Refreh the ACCESS Token using REFREH Token
+            // Refresh the ACCESS Token using REFRESH Token
             return refreshToken(req, res, next, verifyToken)
         }
 
     } else {
-        return res.status(401).send({ data: 'Cookie is not recieved', error: true });
+        return res.status(403).send({ data: 'Cookie is not received', error: true });
     }
 }
 

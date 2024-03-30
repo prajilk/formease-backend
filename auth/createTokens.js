@@ -31,7 +31,7 @@ const createTokens = (req, res) => {
             maxAge: 1296000000 // 15 Days
         });
 
-        return res.status(200).json({ error: false })
+        return res.status(200).json({ token: accessToken, error: false })
     }).catch(() => {
         return res.status(401).json({ error: true })
     })

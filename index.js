@@ -3,15 +3,17 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 require('dotenv').config()
-const createTokens = require('./auth/createTokens');
-const verifyToken = require('./auth/verifyToken')
+// const createTokens = require('./auth/createTokens');
+// const verifyToken = require('./auth/verifyToken')
+const { verifyToken } = require('./auth/v1/verifyToken')
 
 //Connect to database
 require('./db/dbConnection')();
 
 const userHelper = require('./helpers/userHelper');
-const getUserDetails = require('./auth/getUserDetails');
+// const getUserDetails = require('./auth/getUserDetails');
 const formHelper = require('./helpers/formHelper');
+const { login } = require('./auth/v1/login');
 
 const app = express();
 
@@ -23,10 +25,6 @@ app.use(cors({
     credentials: true
 }))
 
-app.get('/test', (req, res) => {
-    res.json({ test: 'success' })
-})
-
 // Register new user
 app.post('/register', (req, res) => {
     userHelper.register(req.body).then(() => {
@@ -37,28 +35,30 @@ app.post('/register', (req, res) => {
 })
 
 // Login route
-app.post('/login', async (req, res) => { createTokens(req, res); })
+// app.post('/login', async (req, res) => { createTokens(req, res); })
+app.post('/login', async (req, res) => login(req, res))
 
 // Verify user
-app.get('/user/verify', verifyToken)
+app.get('/user/verify', verifyToken, (req, res) => {
+    res.status(200).json({ message: "Access granted" });
+})
 
 // Signout user
-app.get('/signout', (req, res) => {
-    res.clearCookie("accessToken", {
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-        expires: new Date(0),
-    });
-    res.clearCookie("refreshToken", {
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-        expires: new Date(0),
-    });
-    res.status(200).json({ data: "Logout out successfully" });
-
-})
+// app.get('/signout', (req, res) => {
+//     res.clearCookie("accessToken", {
+//         httpOnly: true,
+//         sameSite: "none",
+//         secure: true,
+//         expires: new Date(0),
+//     });
+//     res.clearCookie("refreshToken", {
+//         httpOnly: true,
+//         sameSite: "none",
+//         secure: true,
+//         expires: new Date(0),
+//     });
+//     res.status(200).json({ data: "Logout out successfully" });
+// })
 
 app.post('/edit-profile', (req, res) => {
     userHelper.editProfile(req.body).then(() => {
@@ -74,7 +74,7 @@ app.post('/edit-profile', (req, res) => {
     })
 })
 
-app.post('/change-password', getUserDetails, (req, res) => {
+app.post('/change-password', verifyToken, (req, res) => {
     userHelper.changePassword(req.body, req.user._id).then((data) => {
         res.status(data.status_code).json(data)
     }).catch((err) => {
@@ -82,7 +82,7 @@ app.post('/change-password', getUserDetails, (req, res) => {
     })
 })
 
-app.get('/delete-account', getUserDetails, (req, res) => {
+app.get('/delete-account', verifyToken, (req, res) => {
     userHelper.deleteAccount(req.user._id).then(() => {
         res.clearCookie('accessToken', {
             httpOnly: true,
@@ -102,7 +102,7 @@ app.get('/delete-account', getUserDetails, (req, res) => {
     })
 })
 
-app.get('/number-of-forms', getUserDetails, (req, res) => {
+app.get('/number-of-forms', verifyToken, (req, res) => {
     formHelper.getTotalNumberOfForms(req.user._id).then((totalForms) => {
         res.status(200).json({ total_forms: totalForms })
     }).catch((err) => {
@@ -110,7 +110,7 @@ app.get('/number-of-forms', getUserDetails, (req, res) => {
     })
 })
 
-app.get('/get-api', getUserDetails, (req, res) => {
+app.get('/get-api', verifyToken, (req, res) => {
     userHelper.getAPI(req.user._id).then((apiDetails) => {
         res.status(200).json(apiDetails)
     }).catch((err) => {
@@ -118,7 +118,7 @@ app.get('/get-api', getUserDetails, (req, res) => {
     })
 })
 
-app.get('/roll-api', getUserDetails, (req, res) => {
+app.get('/roll-api', verifyToken, (req, res) => {
     userHelper.rollAPI(req.user._id).then((newKey) => {
         res.status(200).json({ new_API_key: newKey })
     }).catch((err) => {
@@ -126,7 +126,7 @@ app.get('/roll-api', getUserDetails, (req, res) => {
     })
 })
 
-app.get('/revoke-api', getUserDetails, (req, res) => {
+app.get('/revoke-api', verifyToken, (req, res) => {
     userHelper.revokeAPI(req.user._id).then(() => {
         res.status(200).json({ api_revoked: true })
     }).catch((err) => {
@@ -134,7 +134,7 @@ app.get('/revoke-api', getUserDetails, (req, res) => {
     })
 })
 
-app.get('/grant-api', getUserDetails, (req, res) => {
+app.get('/grant-api', verifyToken, (req, res) => {
     userHelper.grantAPI(req.user._id).then((apiKey) => {
         res.status(200).json({ api_key: apiKey })
     }).catch((err) => {
@@ -142,7 +142,7 @@ app.get('/grant-api', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/create-new-form', getUserDetails, (req, res) => {
+app.post('/create-new-form', verifyToken, (req, res) => {
     formHelper.createNewForm(req.user._id, req.body).then(() => {
         res.status(200).json({ status: "success" })
     }).catch((err) => {
@@ -150,7 +150,7 @@ app.post('/create-new-form', getUserDetails, (req, res) => {
     })
 })
 
-app.get('/get-forms', getUserDetails, (req, res) => {
+app.get('/get-forms', verifyToken, (req, res) => {
     formHelper.getAllForms(req.user._id).then((formList) => {
         res.status(200).json({ formList })
     }).catch((err) => {
@@ -158,7 +158,7 @@ app.get('/get-forms', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/get-this-form', getUserDetails, (req, res) => {
+app.post('/get-this-form', verifyToken, (req, res) => {
     formHelper.getThisForm(req.body.form_id, req.user._id).then((formData) => {
         res.status(200).json({ forms: formData.forms })
     }).catch((err) => {
@@ -169,7 +169,7 @@ app.post('/get-this-form', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/get-form-analytics', getUserDetails, (req, res) => {
+app.post('/get-form-analytics', verifyToken, (req, res) => {
     formHelper.getFormAnalytics(req.body.form_id, req.user._id).then((formAnalytics) => {
         res.status(200).json({ formAnalytics })
     }).catch((err) => {
@@ -180,7 +180,7 @@ app.post('/get-form-analytics', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/delete-form', getUserDetails, (req, res) => {
+app.post('/delete-form', verifyToken, (req, res) => {
     formHelper.deleteThisForm(req.user._id, req.body.form_id).then((response) => {
         if (response.status_code === 200)
             res.status(200).json(response)
@@ -193,7 +193,7 @@ app.post('/delete-form', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/edit-form', getUserDetails, (req, res) => {
+app.post('/edit-form', verifyToken, (req, res) => {
     formHelper.editForm(req.user._id, req.body).then(() => {
         res.status(200).json({ status: 'Form updated successfully' });
     }).catch((err) => {
@@ -202,7 +202,7 @@ app.post('/edit-form', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/change-service', getUserDetails, (req, res) => {
+app.post('/change-service', verifyToken, (req, res) => {
     formHelper.changeFormService(req.user._id, req.body).then(() => {
         res.status(200).json({ status: 'Service stopped successfully' });
     }).catch((err) => {
@@ -211,7 +211,7 @@ app.post('/change-service', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/change-send-mail', getUserDetails, (req, res) => {
+app.post('/change-send-mail', verifyToken, (req, res) => {
     formHelper.changeSendMailService(req.user._id, req.body).then(() => {
         res.status(200).json({ status: 'Send mail service changed successfully' });
     }).catch((err) => {
@@ -220,7 +220,7 @@ app.post('/change-send-mail', getUserDetails, (req, res) => {
     })
 })
 
-app.post('/delete-this-submission', getUserDetails, (req, res) => {
+app.post('/delete-this-submission', verifyToken, (req, res) => {
     formHelper.deleteThisSubmission(req.body.formId, req.body.submissionId, req.user._id).then(() => {
         res.status(200).json({ submissionDeleted: true });
     }).catch((err) => {
